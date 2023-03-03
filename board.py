@@ -1,41 +1,38 @@
-from enum import Enum
+import csv
 
-class ACTION(Enum):
-    LEFT = 1
-    RIGHT = 2
-    UP = 3
-    DOWN = 4
+class Board:
+    def __init__(self, filename):    
+        self.board = self.read(filename)
+        self.start = [(ind, self.board[ind].index('S')) for ind in range(len(self.board)) if 'S' in self.board[ind]][0]
+        self.win_states = self.find_win_states()
+        self.lose_states = self.find_lose_states()
 
-board = [[]]
+    def read(self, board_file):
+        board_array = []
+        with open(board_file,newline = '') as board:
+            board_data = csv.reader(board, delimiter='\t')
+            for row in board_data:
+                board_array.append(row)
+        return board_array
 
-def read_board(fileName):
-    pass
-
-def print_board():
-    pass
-
-# Returns the new state (board position) reached by taking action a from state s
-# TODO: Add probabilistic movement, 2 steps forward.
-def next_state(s,a):
-    row = s[0]
-    col = s[1]
-    if   (a == ACTION.LEFT):
-        col -= 1
-    elif (a == ACTION.RIGHT):
-        col += 1
-    elif (a == ACTION.UP):
-        row -= 1
-    elif (a == ACTION.DOWN):
-        row += 1
+    def find_win_states(self):
+        win_states = []
+        for i in range(len(self.board)):
+            for j in range(len(self.board[0])):
+                try:
+                    if float(self.board[i][j]) > 0:
+                        win_states.append((i,j))
+                except ValueError:
+                    continue
+        return win_states
     
-    if (row < 0): row += 1
-    if (col < 0): col += 1
-    if (row > len(board)): row -= 1
-    if (row > len(board[0])): col -= 1
-
-    s[0] = row
-    s[1] = col
-
-    return s
-
-
+    def find_lose_states(self):
+        lose_states = []
+        for i in range(len(self.board)):
+            for j in range(len(self.board[0])):
+                try:
+                    if float(self.board[i][j]) < 0:
+                        lose_states.append((i,j))
+                except ValueError:
+                    continue
+        return lose_states
