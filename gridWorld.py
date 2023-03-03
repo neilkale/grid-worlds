@@ -4,7 +4,7 @@ import time
 
 class Agent:
 
-    def __init__(self, grid_environment, lr=.9,exp_rate =0.2):
+    def __init__(self, grid_environment, lr=0.2,exp_rate =0.2):
         self.states = []
         self.actions = ["up", "down", "left", "right"]
         
@@ -31,7 +31,6 @@ class Agent:
         else:
             # greedy action
             for a in self.actions:
-                # if the action is deterministic
                 nxt_reward = self.state_values[self.State.nxtPosition(a)]
                 if nxt_reward >= mx_nxt_reward:
                     action = a
@@ -56,7 +55,7 @@ class Agent:
                 reward = self.State.giveReward()
                 # explicitly assign end state to reward values
                 self.state_values[self.State.state] = reward  # this is optional
-                print("Game End Reward", reward)
+                #print("Game End Reward", reward)
                 for s in reversed(self.states):
                     reward = self.state_values[s] + self.lr * (reward - self.state_values[s])
                     self.state_values[s] = round(reward, 3)
@@ -65,13 +64,13 @@ class Agent:
                 action = self.chooseAction()
                 # append trace
                 self.states.append(self.State.nxtPosition(action))
-                print("current position {} action {}".format(self.State.state, action))
+                #print("current position {} action {}".format(self.State.state, action))
                 # by taking the action, it reaches the next state
                 self.State = self.takeAction(action)
                 # mark is end
                 self.State.isEndFunc()
-                print("nxt state", self.State.state)
-                print("---------------------")
+                #print("nxt state", self.State.state)
+                #print("---------------------")
 
     def showValues(self):
         for i in range(0, len(self.grid_environment.board)):

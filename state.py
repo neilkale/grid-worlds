@@ -33,6 +33,6 @@ class State:
         # if next state legal
         if (nxtState[0] >= 0) and (nxtState[0] <= (len(self.grid_environment.board) -1)):
             if (nxtState[1] >= 0) and (nxtState[1] <= (len(self.grid_environment.board[0]) -1)):
-                if nxtState != (1, 1):
-                    return nxtState
+                #if nxtState != (1, 1):
+                return nxtState
         return self.state
