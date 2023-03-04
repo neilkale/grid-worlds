@@ -8,7 +8,7 @@ class State:
         self.state = state
         self.isEnd = False
         
-    def giveReward(self):
+    def giveReward(self,action_penalty=0):
         if self.state in self.grid_environment.win_states:
             return float(self.grid_environment.board[self.state[0]][self.state[1]])
         elif self.state in self.grid_environment.lose_states:

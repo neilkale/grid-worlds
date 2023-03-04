@@ -4,13 +4,15 @@ import time
 
 class Agent:
 
-    def __init__(self, grid_environment, lr=0.2,exp_rate =0.2):
+    def __init__(self, grid_environment, lr=0.2,exp_rate =0.2,action_penalty=0):
         self.states = []
         self.actions = ["up", "down", "left", "right"]
         
         self.lr = lr
         self.exp_rate = exp_rate
         self.grid_environment = grid_environment
+
+        self.action_penalty = action_penalty
         
         # Create state using the board and the start position
         self.State = state.State(self.grid_environment,self.grid_environment.start)
@@ -74,16 +76,16 @@ class Agent:
 
     def showValues(self):
         for i in range(0, len(self.grid_environment.board)):
-            print('----------------------------------')
+            print('-'*(9*len(self.grid_environment.board[0])+1))
             out = '| '
             for j in range(0, len(self.grid_environment.board[0])):
                 out += str(self.state_values[(i, j)]).ljust(6) + ' | '
             print(out)
-        print('----------------------------------')
+        print('-'*(9*len(self.grid_environment.board[0])+1))
 
     def showPolicy(self):
         for i in range(0, len(self.grid_environment.board)):
-            print('----------------------------------')
+            print('-'*(9*len(self.grid_environment.board[0])+1))
             out = '| '
             for j in range(0, len(self.grid_environment.board[0])):
                 mx_nxt_reward = -10
@@ -94,6 +96,7 @@ class Agent:
                 elif val in self.grid_environment.win_states or val in self.grid_environment.lose_states:
                     token = str(self.grid_environment.board[i][j])
                 else:
+                    action='up'
                     for a in self.actions:
                         nxt_reward = self.state_values[it_state.nxtPosition(a)]
                         if nxt_reward >= mx_nxt_reward:
@@ -103,7 +106,7 @@ class Agent:
                         token = self.get_token(action)
                 out += token.ljust(6) + ' | '
             print(out)
-        print('----------------------------------')
+        print('-'*(9*len(self.grid_environment.board[0])+1))
 
     def get_token(self, action):
         if action == "up":
