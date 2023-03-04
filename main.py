@@ -18,8 +18,9 @@ def main():
     grid_environment = board.Board(board_file)
     
     ag = gridWorld.Agent(grid_environment)
-    ag.play(1)
-    print(ag.showValues()) 
+    ag.play(5)
+    ag.showValues()
+    ag.showPolicy()
 
 if __name__ == "__main__":
     main()

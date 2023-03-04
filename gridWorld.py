@@ -80,3 +80,38 @@ class Agent:
                 out += str(self.state_values[(i, j)]).ljust(6) + ' | '
             print(out)
         print('----------------------------------')
+
+    def showPolicy(self):
+        for i in range(0, len(self.grid_environment.board)):
+            print('----------------------------------')
+            out = '| '
+            for j in range(0, len(self.grid_environment.board[0])):
+                mx_nxt_reward = -10
+                val = (i,j)
+                it_state = state.State(self.grid_environment,val)
+                if val in self.grid_environment.barriers:
+                    token = 'X'
+                elif val in self.grid_environment.win_states or val in self.grid_environment.lose_states:
+                    token = str(self.grid_environment.board[i][j])
+                else:
+                    for a in self.actions:
+                        nxt_reward = self.state_values[it_state.nxtPosition(a)]
+                        if nxt_reward >= mx_nxt_reward:
+                            #print(a, nxt_reward, mx_nxt_reward)
+                            action = a
+                            mx_nxt_reward = nxt_reward
+                        token = self.get_token(action)
+                out += token.ljust(6) + ' | '
+            print(out)
+        print('----------------------------------')
+
+    def get_token(self, action):
+        if action == "up":
+            token = "^"
+        if action == "down":
+            token = "V"
+        if action == "right":
+            token = ">"
+        if action == "left":
+            token = "<"
+        return token
