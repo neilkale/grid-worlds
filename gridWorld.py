@@ -4,7 +4,7 @@ import time
 
 class Agent:
 
-    def __init__(self, grid_environment, lr=0.2,exp_rate =0.2,action_penalty=0):
+    def __init__(self, grid_environment, lr=0.2,exp_rate=0.2,action_penalty=0):
         self.states = []
         self.actions = ["up", "down", "left", "right"]
         
@@ -26,6 +26,8 @@ class Agent:
         for i in range(len(self.grid_environment.board)):
             for j in range(len(self.grid_environment.board[0])):
                 self.heat_map[(i, j)] = 0  # set initial value to 0
+        self.visited_cookies = []
+        self.visited_glass = []
 
     def chooseAction(self):
         # choose action with most expected value
@@ -50,6 +52,8 @@ class Agent:
     def reset(self):
         self.states = []
         self.State = state.State(self.grid_environment,self.grid_environment.start)
+        self.visited_cookies = []
+        self.visited_glass = []
 
     def play(self, max_time=1):
         init = time.time()

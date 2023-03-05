@@ -7,6 +7,8 @@ class Board:
         self.win_states = self.find_win_states()
         self.lose_states = self.find_lose_states()
         self.barriers = [(ind, self.board[ind].index('X')) for ind in range(len(self.board)) if 'X' in self.board[ind]]
+        self.cookies = [(ind, self.board[ind].index('+')) for ind in range(len(self.board)) if '+' in self.board[ind]]
+        self.glass = [(ind, self.board[ind].index('-')) for ind in range(len(self.board)) if '-' in self.board[ind]]
 
     def read(self, board_file):
         board_array = []
