@@ -22,6 +22,10 @@ class Agent:
         for i in range(len(self.grid_environment.board)):
             for j in range(len(self.grid_environment.board[0])):
                 self.state_values[(i, j)] = 0  # set initial value to 0
+        self.heat_map = {}
+        for i in range(len(self.grid_environment.board)):
+            for j in range(len(self.grid_environment.board[0])):
+                self.heat_map[(i, j)] = 0  # set initial value to 0
 
     def chooseAction(self):
         # choose action with most expected value
@@ -62,6 +66,7 @@ class Agent:
                 for s in reversed(self.states):
                     reward = self.state_values[s] + self.lr * (reward - self.state_values[s] + action_counter*self.action_penalty)
                     self.state_values[s] = round(reward, 3)
+                    self.heat_map[s] = self.heat_map[s] + 1
                 self.reset()
             else:
                 action = self.chooseAction()
@@ -80,7 +85,33 @@ class Agent:
             print('-'*(9*len(self.grid_environment.board[0])+1))
             out = '| '
             for j in range(0, len(self.grid_environment.board[0])):
-                out += str(self.state_values[(i, j)]).ljust(6) + ' | '
+                val = (i,j)
+                if val in self.grid_environment.barriers:
+                    out += 'X'.ljust(6) + ' | '
+                elif val in self.grid_environment.win_states or val in self.grid_environment.lose_states:
+                    out += str(self.grid_environment.board[i][j]).ljust(6) + ' | '
+                else:
+                    out += str(self.state_values[(i, j)]).ljust(6) + ' | '
+            print(out)
+        print('-'*(9*len(self.grid_environment.board[0])+1))
+
+    def showHeatMap(self):
+        total = 0
+        for i in range(len(self.grid_environment.board)):
+            for j in range(len(self.grid_environment.board[0])):
+                total += self.heat_map[(i,j)]
+        
+        for i in range(0, len(self.grid_environment.board)):
+            print('-'*(9*len(self.grid_environment.board[0])+1))
+            out = '| '
+            for j in range(0, len(self.grid_environment.board[0])):
+                val = (i,j)
+                if val in self.grid_environment.barriers:
+                    out += 'X'.ljust(6) + ' | '
+                elif val in self.grid_environment.win_states or val in self.grid_environment.lose_states:
+                    out += str(self.grid_environment.board[i][j]).ljust(6) + ' | '
+                else:
+                    out += str(round(100*self.heat_map[(i, j)]/total,2)).ljust(6) + ' | '
             print(out)
         print('-'*(9*len(self.grid_environment.board[0])+1))
 

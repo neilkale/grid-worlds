@@ -19,8 +19,12 @@ def main():
     grid_environment = board.Board(board_file)
     
     ag = gridWorld.Agent(grid_environment,action_penalty=action_penalty)
-    ag.play(10)
+    ag.play(1)
+    print('Utility Values')
     ag.showValues()
+    print('Agent Time Spent Heat Map')
+    ag.showHeatMap()
+    print('Policy')
     ag.showPolicy()
 
 if __name__ == "__main__":
