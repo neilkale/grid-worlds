@@ -58,8 +58,9 @@ class Agent:
                 # explicitly assign end state to reward values
                 self.state_values[self.State.state] = reward  # this is optional
                 #print("Game End Reward", reward)
+                action_counter = 1
                 for s in reversed(self.states):
-                    reward = self.state_values[s] + self.lr * (reward - self.state_values[s])
+                    reward = self.state_values[s] + self.lr * (reward - self.state_values[s] + action_counter*self.action_penalty)
                     self.state_values[s] = round(reward, 3)
                 self.reset()
             else:

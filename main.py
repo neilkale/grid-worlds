@@ -11,15 +11,15 @@ def main():
     
     #run_time = sys.argv[2]
     #action_penalty = sys.argv[3]
-    action_penalty = -0.1
+    action_penalty = -.1
     #transition_model = sys.argv[4]
     #time_based = sys.argv[5]
     #run(board_file, float(run_time), action_penalty, transition_model, time_based)
     
     grid_environment = board.Board(board_file)
     
-    ag = gridWorld.Agent(grid_environment,action_penalty=-0.5)
-    ag.play(5)
+    ag = gridWorld.Agent(grid_environment,action_penalty=action_penalty)
+    ag.play(10)
     ag.showValues()
     ag.showPolicy()
 
