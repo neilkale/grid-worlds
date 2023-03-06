@@ -1,6 +1,5 @@
 import time
 import sys
-import agent
 import gridWorld
 import csv
 import board

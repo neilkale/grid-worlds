@@ -49,6 +49,34 @@ class Agent:
         position = self.State.nxtPosition(action)
         return state.State(self.grid_environment, state=position)
 
+
+    def transitionModel(self, state, action):
+        success_p = 0.7
+        two_jumps = 0.15
+        backward = 0.15
+
+        next_states = {}
+        
+        # Compute the possible next states and their probabilities
+        if action == 'up':
+            next_row = max(row - 1, 0)
+            next_state = next_row * grid_size + col
+            next_state_probs[next_state] = 1
+        elif action == 'down':
+            next_row = min(row + 1, grid_size - 1)
+            next_state = next_row * grid_size + col
+            next_state_probs[next_state] = 1
+        elif action == 'left':
+            next_col = max(col - 1, 0)
+            next_state = row * grid_size + next_col
+            next_state_probs[next_state] = 1
+        elif action == 'right':
+            next_col = min(col + 1, grid_size - 1)
+            next_state = row * grid_size + next_col
+            next_state_probs[next_state] = 1
+            return next_states
+
+
     def reset(self):
         self.states = []
         self.State = state.State(self.grid_environment,self.grid_environment.start)
