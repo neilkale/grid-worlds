@@ -10,21 +10,14 @@ class State:
         self.isEnd = False
         
     def giveReward(self):
-        if self.state in self.grid_environment.win_states:
+        #print(self.state, self.grid_environment.cookies, self.visited_cookies)
+        if self.state in self.grid_environment.terminal_states:
             return float(self.grid_environment.board[self.state[0]][self.state[1]])
-        elif self.state in self.grid_environment.lose_states:
-            return float(self.grid_environment.board[self.state[0]][self.state[1]])
-        elif self.state in self.grid_environment.cookies and self.state not in gridWorld.Agent.visited_cookies:
-            gridWorld.Agent.visited_cookies.append(self.state)
-            return 2
-        elif self.state in self.grid_environment.glass and self.state not in gridWorld.Agent.visited_glass:
-            gridWorld.Agent.visited_glass.append(self.state)
-            return 2        
         else:
             return 0
 
     def isEndFunc(self):
-        if (self.state in self.grid_environment.win_states) or (self.state in self.grid_environment.lose_states):
+        if self.state in self.grid_environment.terminal_states:
             self.isEnd = True
 
     def nxtPosition(self, action):    

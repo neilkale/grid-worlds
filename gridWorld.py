@@ -4,8 +4,8 @@ import time
 
 class Agent:
 
-    def __init__(self, grid_environment, lr=0.2,exp_rate=0.2,action_penalty=0):
-        self.states = []
+    def __init__(self, grid_environment, lr=0.05,exp_rate=0.2,action_penalty=0):
+        
         self.actions = ["up", "down", "left", "right"]
         
         self.lr = lr
@@ -16,19 +16,20 @@ class Agent:
         
         # Create state using the board and the start position
         self.State = state.State(self.grid_environment,self.grid_environment.start)
-
+        self.states = [grid_environment.start]
         # initial state reward
         self.state_values = {}
         for i in range(len(self.grid_environment.board)):
             for j in range(len(self.grid_environment.board[0])):
                 self.state_values[(i, j)] = 0  # set initial value to 0
+        
         self.heat_map = {}
         for i in range(len(self.grid_environment.board)):
             for j in range(len(self.grid_environment.board[0])):
                 self.heat_map[(i, j)] = 0  # set initial value to 0
         self.visited_cookies = []
-        self.visited_glass = []
-
+        self.temporary_reward_array =[0]
+        
     def chooseAction(self):
         # choose action with most expected value
         mx_nxt_reward = 0
@@ -43,6 +44,8 @@ class Agent:
                 if nxt_reward >= mx_nxt_reward:
                     action = a
                     mx_nxt_reward = nxt_reward
+        if mx_nxt_reward == 0:
+            action = np.random.choice(self.actions)
         return action
 
     def takeAction(self, action):
@@ -52,15 +55,22 @@ class Agent:
     def reset(self):
         self.states = []
         self.State = state.State(self.grid_environment,self.grid_environment.start)
+        self.states.append(self.grid_environment.start)
         self.visited_cookies = []
         self.visited_glass = []
-
+        self.temporary_reward_array =[0]
+        
     def play(self, max_time=1):
         init = time.time()
-        while (time.time() - init < max_time):
+        k=0
+        while (time.time() - init < max_time):    
+        #while k <= 1000:
             
             # to the end of game back propagate reward
             if self.State.isEnd:
+                print(self.states)
+                print(self.temporary_reward_array)
+                #print('Terminal state reached')
                 # back propagate
                 reward = self.State.giveReward()
                 # explicitly assign end state to reward values
@@ -68,22 +78,31 @@ class Agent:
                 #print("Game End Reward", reward)
                 action_counter = 1
                 for s in reversed(self.states):
-                    reward = self.state_values[s] + self.lr * (reward - self.state_values[s] + action_counter*self.action_penalty)
+                    reward = self.state_values[s] + self.lr * (reward + self.temporary_reward_array[-action_counter] - self.state_values[s] + action_counter*self.action_penalty)
+                    #print(s)
+                    #print(self.temporary_reward_array[-action_counter])
                     self.state_values[s] = round(reward, 3)
                     self.heat_map[s] = self.heat_map[s] + 1
+                    action_counter += 1
                 self.reset()
-            else:
+                k += 1
+                #self.showValues()
+            else:                
                 action = self.chooseAction()
                 # append trace
+                
                 self.states.append(self.State.nxtPosition(action))
-                #print("current position {} action {}".format(self.State.state, action))
+                self.temporary_reward_array.append(0)
                 # by taking the action, it reaches the next state
                 self.State = self.takeAction(action)
+                if self.State.state in self.grid_environment.cookies:
+                    if self.State.state not in self.visited_cookies:
+                        self.visited_cookies.append(self.State.state)
+                        self.temporary_reward_array[-1] = 2        
+
                 # mark is end
                 self.State.isEndFunc()
-                #print("nxt state", self.State.state)
-                #print("---------------------")
-
+                
     def showValues(self):
         for i in range(0, len(self.grid_environment.board)):
             print('-'*(9*len(self.grid_environment.board[0])+1))
@@ -92,7 +111,7 @@ class Agent:
                 val = (i,j)
                 if val in self.grid_environment.barriers:
                     out += 'X'.ljust(6) + ' | '
-                elif val in self.grid_environment.win_states or val in self.grid_environment.lose_states:
+                elif val in self.grid_environment.terminal_states:
                     out += str(self.grid_environment.board[i][j]).ljust(6) + ' | '
                 else:
                     out += str(self.state_values[(i, j)]).ljust(6) + ' | '
@@ -112,7 +131,7 @@ class Agent:
                 val = (i,j)
                 if val in self.grid_environment.barriers:
                     out += 'X'.ljust(6) + ' | '
-                elif val in self.grid_environment.win_states or val in self.grid_environment.lose_states:
+                elif val in self.grid_environment.terminal_states:
                     out += str(self.grid_environment.board[i][j]).ljust(6) + ' | '
                 else:
                     out += str(round(100*self.heat_map[(i, j)]/total,2)).ljust(6) + ' | '
@@ -129,10 +148,10 @@ class Agent:
                 it_state = state.State(self.grid_environment,val)
                 if val in self.grid_environment.barriers:
                     token = 'X'
-                elif val in self.grid_environment.win_states or val in self.grid_environment.lose_states:
+                elif val in self.grid_environment.terminal_states:
                     token = str(self.grid_environment.board[i][j])
                 else:
-                    action='up'
+                    action='none'
                     for a in self.actions:
                         nxt_reward = self.state_values[it_state.nxtPosition(a)]
                         if nxt_reward >= mx_nxt_reward:
@@ -153,4 +172,6 @@ class Agent:
             token = ">"
         if action == "left":
             token = "<"
+        if action == "none":
+            token=" "
         return token
