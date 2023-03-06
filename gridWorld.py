@@ -4,7 +4,7 @@ import time
 
 class Agent:
 
-    def __init__(self, grid_environment, lr=0.05,exp_rate=0.2,action_penalty=0):
+    def __init__(self, grid_environment, lr=0.2,exp_rate=0.2,action_penalty=0):
         
         self.actions = ["up", "down", "left", "right"]
         
