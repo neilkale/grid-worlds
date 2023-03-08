@@ -35,7 +35,7 @@ class State:
             return np.random.choice(["right", "left", "right right"], p=[p_success, p_backward, p_jump])
 
     def nxtPosition(self, action):
-        action = self._chooseActionProb(action)
+        action = self.transitionModel(action)
         action = action.split()
 
         for a in action:
@@ -52,6 +52,5 @@ class State:
                 if (nxtState[1] >= 0) and (nxtState[1] <= (len(self.grid_environment.board[0]) -1)):
                     if nxtState not in self.grid_environment.barriers:
                         return nxtState
-            # write if next state illegal stay at same state
-            else:
-                return self.state
+            #  if next state illegal stay at same state
+            return self.state
