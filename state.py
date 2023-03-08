@@ -1,6 +1,6 @@
 import numpy as np
 import board
-import gridWorld
+import agent
 # global variables
 
 class State:

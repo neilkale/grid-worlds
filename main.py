@@ -1,6 +1,6 @@
 import time
 import sys
-import gridWorld
+import agent
 import csv
 import board
 
@@ -17,7 +17,7 @@ def main():
     
     grid_environment = board.Board(board_file)
     
-    ag = gridWorld.Agent(grid_environment,action_penalty=action_penalty)
+    ag = agent.Agent(grid_environment,action_penalty=action_penalty)
     ag.play(10)
     print('Utility Values')
     ag.showValues()
