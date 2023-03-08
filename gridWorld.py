@@ -53,23 +53,8 @@ class Agent:
         return action
 
     def takeAction(self, action):
-        action = self.transitionModel(action)
         position = self.State.nxtPosition(action)
         return state.State(self.grid_environment, state=position)
-
-    def transitionModel(self, action):
-        p_success = 0.7
-        p_jump = 0.15
-        p_backward = 0.15
-
-        if action == "up":
-            return np.random.choice(["up", "down", "up up"], p=[p_success, p_backward, p_jump])
-        if action == "down":
-            return np.random.choice(["down", "up", "down down"], p=[p_success, p_backward, p_jump])
-        if action == "left":
-            return np.random.choice(["left", "right", "left left"], p=[p_success, p_backward, p_jump])
-        if action == "right":
-            return np.random.choice(["right", "left", "right right"], p=[p_success, p_backward, p_jump])
 
     def reset(self):
         self.states = []
@@ -112,7 +97,6 @@ class Agent:
             else:                
                 action = self.chooseAction()
                 # append trace
-                
                 self.states.append(self.State.nxtPosition(action))
                 self.temporary_reward_array.append(0)
                 # by taking the action, it reaches the next state

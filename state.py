@@ -20,19 +20,38 @@ class State:
         if self.state in self.grid_environment.terminal_states:
             self.isEnd = True
 
-    def nxtPosition(self, action):    
+    def transitionModel(self, action):
+        p_success = 0.7
+        p_jump = 0.15
+        p_backward = 0.15
+
         if action == "up":
-            nxtState = (self.state[0] - 1, self.state[1])
-        elif action == "down":
-            nxtState = (self.state[0] + 1, self.state[1])
-        elif action == "left":
-            nxtState = (self.state[0], self.state[1] - 1)
-        else:
-            nxtState = (self.state[0], self.state[1] + 1)
-        
-        # if next state legal
-        if (nxtState[0] >= 0) and (nxtState[0] <= (len(self.grid_environment.board) -1)):
-            if (nxtState[1] >= 0) and (nxtState[1] <= (len(self.grid_environment.board[0]) -1)):
-                if nxtState not in self.grid_environment.barriers:
-                    return nxtState
-        return self.state
+            return np.random.choice(["up", "down", "up up"], p=[p_success, p_backward, p_jump])
+        if action == "down":
+            return np.random.choice(["down", "up", "down down"], p=[p_success, p_backward, p_jump])
+        if action == "left":
+            return np.random.choice(["left", "right", "left left"], p=[p_success, p_backward, p_jump])
+        if action == "right":
+            return np.random.choice(["right", "left", "right right"], p=[p_success, p_backward, p_jump])
+
+    def nxtPosition(self, action):
+        action = self._chooseActionProb(action)
+        action = action.split()
+
+        for a in action:
+            if a == "up":
+                nxtState = (self.state[0] - 1, self.state[1])
+            elif a == "down":
+                nxtState = (self.state[0] + 1, self.state[1])
+            elif a == "left":
+                nxtState = (self.state[0], self.state[1] - 1)
+            else:
+                nxtState = (self.state[0], self.state[1] + 1)
+            # if next state legal
+            if (nxtState[0] >= 0) and (nxtState[0] <= (len(self.grid_environment.board) -1)):
+                if (nxtState[1] >= 0) and (nxtState[1] <= (len(self.grid_environment.board[0]) -1)):
+                    if nxtState not in self.grid_environment.barriers:
+                        return nxtState
+            # write if next state illegal stay at same state
+            else:
+                return self.state
