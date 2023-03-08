@@ -6,6 +6,7 @@ class Board:
         self.start = [(ind, self.board[ind].index('S')) for ind in range(len(self.board)) if 'S' in self.board[ind]][0]
         self.win_states = self.find_win_states()
         self.lose_states = self.find_lose_states()
+        self.terminals = self.win_states + self.lose_states
         self.barriers = [(ind, self.board[ind].index('X')) for ind in range(len(self.board)) if 'X' in self.board[ind]]
         self.cookies = [(ind, self.board[ind].index('+')) for ind in range(len(self.board)) if '+' in self.board[ind]]
         self.glass = [(ind, self.board[ind].index('-')) for ind in range(len(self.board)) if '-' in self.board[ind]]

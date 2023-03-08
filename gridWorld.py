@@ -4,18 +4,19 @@ import time
 
 class Agent:
 
-    def __init__(self, grid_environment, lr=0.2,exp_rate=0.2,action_penalty=0):
+    def __init__(self, grid_environment, lr=0.2, exp_rate=0.2, action_penalty=0):
         self.states = []
         self.actions = ["up", "down", "left", "right"]
-        
+
         self.lr = lr
         self.exp_rate = exp_rate
         self.grid_environment = grid_environment
-
+        self.grid_size = self.get_size(self.grid_environment.board)
         self.action_penalty = action_penalty
-        
+
         # Create state using the board and the start position
-        self.State = state.State(self.grid_environment,self.grid_environment.start)
+        self.State = state.State(
+            self.grid_environment, self.grid_environment.start)
 
         # initial state reward
         self.state_values = {}
@@ -28,6 +29,9 @@ class Agent:
                 self.heat_map[(i, j)] = 0  # set initial value to 0
         self.visited_cookies = []
         self.visited_glass = []
+
+    def get_size(self, board):
+        return [len(board), len(board[0])]
 
     def chooseAction(self):
         # choose action with most expected value
@@ -46,57 +50,47 @@ class Agent:
         return action
 
     def takeAction(self, action):
+        action = self.transitionModel(action)
         position = self.State.nxtPosition(action)
         return state.State(self.grid_environment, state=position)
 
+    def transitionModel(self, action):
+        p_success = 0.7
+        p_jump = 0.15
+        p_backward = 0.15
 
-    def transitionModel(self, state, action):
-        success_p = 0.7
-        two_jumps = 0.15
-        backward = 0.15
-
-        next_states = {}
-        
-        # Compute the possible next states and their probabilities
-        if action == 'up':
-            next_row = max(row - 1, 0)
-            next_state = next_row * grid_size + col
-            next_state_probs[next_state] = 1
-        elif action == 'down':
-            next_row = min(row + 1, grid_size - 1)
-            next_state = next_row * grid_size + col
-            next_state_probs[next_state] = 1
-        elif action == 'left':
-            next_col = max(col - 1, 0)
-            next_state = row * grid_size + next_col
-            next_state_probs[next_state] = 1
-        elif action == 'right':
-            next_col = min(col + 1, grid_size - 1)
-            next_state = row * grid_size + next_col
-            next_state_probs[next_state] = 1
-            return next_states
-
+        if action == "up":
+            return np.random.choice(["up", "down", "up up"], p=[p_success, p_backward, p_jump])
+        if action == "down":
+            return np.random.choice(["down", "up", "down down"], p=[p_success, p_backward, p_jump])
+        if action == "left":
+            return np.random.choice(["left", "right", "left left"], p=[p_success, p_backward, p_jump])
+        if action == "right":
+            return np.random.choice(["right", "left", "right right"], p=[p_success, p_backward, p_jump])
 
     def reset(self):
         self.states = []
-        self.State = state.State(self.grid_environment,self.grid_environment.start)
+        self.State = state.State(
+            self.grid_environment, self.grid_environment.start)
         self.visited_cookies = []
         self.visited_glass = []
 
     def play(self, max_time=1):
         init = time.time()
         while (time.time() - init < max_time):
-            
+
             # to the end of game back propagate reward
             if self.State.isEnd:
                 # back propagate
                 reward = self.State.giveReward()
                 # explicitly assign end state to reward values
-                self.state_values[self.State.state] = reward  # this is optional
+                # this is optional
+                self.state_values[self.State.state] = reward
                 #print("Game End Reward", reward)
                 action_counter = 1
                 for s in reversed(self.states):
-                    reward = self.state_values[s] + self.lr * (reward - self.state_values[s] + action_counter*self.action_penalty)
+                    reward = self.state_values[s] + self.lr * (
+                        reward - self.state_values[s] + action_counter*self.action_penalty)
                     self.state_values[s] = round(reward, 3)
                     self.heat_map[s] = self.heat_map[s] + 1
                 self.reset()
@@ -110,18 +104,19 @@ class Agent:
                 # mark is end
                 self.State.isEndFunc()
                 #print("nxt state", self.State.state)
-                #print("---------------------")
+                # print("---------------------")
 
     def showValues(self):
         for i in range(0, len(self.grid_environment.board)):
             print('-'*(9*len(self.grid_environment.board[0])+1))
             out = '| '
             for j in range(0, len(self.grid_environment.board[0])):
-                val = (i,j)
+                val = (i, j)
                 if val in self.grid_environment.barriers:
                     out += 'X'.ljust(6) + ' | '
                 elif val in self.grid_environment.win_states or val in self.grid_environment.lose_states:
-                    out += str(self.grid_environment.board[i][j]).ljust(6) + ' | '
+                    out += str(self.grid_environment.board[i]
+                               [j]).ljust(6) + ' | '
                 else:
                     out += str(self.state_values[(i, j)]).ljust(6) + ' | '
             print(out)
@@ -131,19 +126,21 @@ class Agent:
         total = 0
         for i in range(len(self.grid_environment.board)):
             for j in range(len(self.grid_environment.board[0])):
-                total += self.heat_map[(i,j)]
-        
+                total += self.heat_map[(i, j)]
+
         for i in range(0, len(self.grid_environment.board)):
             print('-'*(9*len(self.grid_environment.board[0])+1))
             out = '| '
             for j in range(0, len(self.grid_environment.board[0])):
-                val = (i,j)
+                val = (i, j)
                 if val in self.grid_environment.barriers:
                     out += 'X'.ljust(6) + ' | '
                 elif val in self.grid_environment.win_states or val in self.grid_environment.lose_states:
-                    out += str(self.grid_environment.board[i][j]).ljust(6) + ' | '
+                    out += str(self.grid_environment.board[i]
+                               [j]).ljust(6) + ' | '
                 else:
-                    out += str(round(100*self.heat_map[(i, j)]/total,2)).ljust(6) + ' | '
+                    out += str(round(100 *
+                               self.heat_map[(i, j)]/total, 2)).ljust(6) + ' | '
             print(out)
         print('-'*(9*len(self.grid_environment.board[0])+1))
 
@@ -153,14 +150,14 @@ class Agent:
             out = '| '
             for j in range(0, len(self.grid_environment.board[0])):
                 mx_nxt_reward = -10
-                val = (i,j)
-                it_state = state.State(self.grid_environment,val)
+                val = (i, j)
+                it_state = state.State(self.grid_environment, val)
                 if val in self.grid_environment.barriers:
                     token = 'X'
                 elif val in self.grid_environment.win_states or val in self.grid_environment.lose_states:
                     token = str(self.grid_environment.board[i][j])
                 else:
-                    action='up'
+                    action = 'up'
                     for a in self.actions:
                         nxt_reward = self.state_values[it_state.nxtPosition(a)]
                         if nxt_reward >= mx_nxt_reward:
