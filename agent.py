@@ -2,10 +2,11 @@ import numpy as np
 import state
 import time
 
+
 class Agent:
 
     def __init__(self, grid_environment, lr=0.2, exp_rate=0.2, action_penalty=0):
-        
+
         self.actions = ["up", "down", "left", "right"]
 
         self.lr = lr
@@ -23,14 +24,14 @@ class Agent:
         for i in range(len(self.grid_environment.board)):
             for j in range(len(self.grid_environment.board[0])):
                 self.state_values[(i, j)] = 0  # set initial value to 0
-        
+
         self.heat_map = {}
         for i in range(len(self.grid_environment.board)):
             for j in range(len(self.grid_environment.board[0])):
                 self.heat_map[(i, j)] = 0  # set initial value to 0
         self.visited_cookies = []
-        self.temporary_reward_array =[0]
-        
+        self.temporary_reward_array = [0]
+
     def get_size(self, board):
         return [len(board), len(board[0])]
 
@@ -63,13 +64,13 @@ class Agent:
         self.states.append(self.grid_environment.start)
         self.visited_cookies = []
         self.visited_glass = []
-        self.temporary_reward_array =[0]
-        
+        self.temporary_reward_array = [0]
+
     def play(self, max_time=1):
         init = time.time()
-        k=0
-        while (time.time() - init < max_time):    
-        #while k <= 1000:
+        k = 0
+        while (time.time() - init < max_time):
+            # while k <= 1000:
 
             # to the end of game back propagate reward
             if self.State.isEnd:
@@ -86,15 +87,15 @@ class Agent:
                 for s in reversed(self.states):
                     reward = self.state_values[s] + self.lr * (
                         reward + self.temporary_reward_array[-action_counter] - self.state_values[s] + action_counter*self.action_penalty)
-                    #print(s)
-                    #print(self.temporary_reward_array[-action_counter])
+                    # print(s)
+                    # print(self.temporary_reward_array[-action_counter])
                     self.state_values[s] = round(reward, 3)
                     self.heat_map[s] = self.heat_map[s] + 1
                     action_counter += 1
                 self.reset()
                 k += 1
-                #self.showValues()
-            else:     
+                # self.showValues()
+            else:
                 action = self.chooseAction()
                 # append trace
                 self.states.append(self.State.nxtPosition(action))
@@ -104,11 +105,11 @@ class Agent:
                 if self.State.state in self.grid_environment.cookies:
                     if self.State.state not in self.visited_cookies:
                         self.visited_cookies.append(self.State.state)
-                        self.temporary_reward_array[-1] = 2        
+                        self.temporary_reward_array[-1] = 2
 
                 # mark is end
                 self.State.isEndFunc()
-                
+
     def showValues(self):
         for i in range(0, len(self.grid_environment.board)):
             print('-'*(9*len(self.grid_environment.board[0])+1))
@@ -182,5 +183,5 @@ class Agent:
         if action == "left":
             token = "<"
         if action == "none":
-            token=" "
+            token = " "
         return token
