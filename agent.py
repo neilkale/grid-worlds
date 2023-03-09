@@ -94,7 +94,7 @@ class Agent:
                 self.reset()
                 k += 1
                 #self.showValues()
-            else:                
+            else:     
                 action = self.chooseAction()
                 # append trace
                 self.states.append(self.State.nxtPosition(action))

@@ -34,6 +34,13 @@ class State:
         if action == "right":
             return np.random.choice(["right", "left", "right right"], p=[p_success, p_backward, p_jump])
 
+    def isLegal(self, state):
+        if (state[0] >= 0) and (state[0] <= (len(self.grid_environment.board) - 1)):
+            if (state[1] >= 0) and (state[1] <= (len(self.grid_environment.board[0]) - 1)):
+                if state not in self.grid_environment.barriers:
+                    return True
+        return False
+
     def movement(self, action):
         if action == "up":
             nxtState = (self.state[0] - 1, self.state[1])
@@ -41,22 +48,41 @@ class State:
             nxtState = (self.state[0] + 1, self.state[1])
         elif action == "left":
             nxtState = (self.state[0], self.state[1] - 1)
-        else:
+        elif action == "right":
             nxtState = (self.state[0], self.state[1] + 1)
-            
+        return nxtState
+
+    def jump(self, action):
+        # two steps
+        if action == "up up":
+            nxtState = (self.state[0] - 2, self.state[1])
+        elif action == "down down":
+            nxtState = (self.state[0] + 2, self.state[1])
+        elif action == "left left":
+            nxtState = (self.state[0], self.state[1] - 2)
+        elif action == "right right":
+            nxtState = (self.state[0], self.state[1] + 2)
+
         return nxtState
 
     def nxtPosition(self, action):
         action = self.transitionModel(action)
-        action = action.split()
+        # action = "down down"
 
-        for a in action:
-            nxtState = self.movement(a) 
-
+        if len(action.split()) == 2:
+            nxtState = self.jump(action)
             # if next state legal
-            if (nxtState[0] >= 0) and (nxtState[0] <= (len(self.grid_environment.board) -1)):
-                if (nxtState[1] >= 0) and (nxtState[1] <= (len(self.grid_environment.board[0]) -1)):
-                    if nxtState not in self.grid_environment.barriers:
-                        return nxtState
-            #  if next state illegal stay at same state
-            return self.state
+            if self.isLegal(nxtState):
+                return nxtState
+            else:
+                nxtState = self.movement(action.split()[0])
+                if self.isLegal(nxtState):
+                    return nxtState
+                else:
+                    return self.state
+        else:
+            nxtState = self.movement(action)
+            if self.isLegal(nxtState):
+                return nxtState
+            else:
+                return self.state
