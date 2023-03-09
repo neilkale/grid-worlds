@@ -1,16 +1,16 @@
 import numpy as np
-import board
-import agent
-# global variables
+# import board
+# import agent
+
 
 class State:
     def __init__(self, grid_environment, state):
         self.grid_environment = grid_environment
         self.state = state
         self.isEnd = False
-        
+
     def giveReward(self):
-        #print(self.state, self.grid_environment.cookies, self.visited_cookies)
+        # print(self.state, self.grid_environment.cookies, self.visited_cookies)
         if self.state in self.grid_environment.terminal_states:
             return float(self.grid_environment.board[self.state[0]][self.state[1]])
         else:
@@ -34,19 +34,25 @@ class State:
         if action == "right":
             return np.random.choice(["right", "left", "right right"], p=[p_success, p_backward, p_jump])
 
+    def movement(self, action):
+        if action == "up":
+            nxtState = (self.state[0] - 1, self.state[1])
+        elif action == "down":
+            nxtState = (self.state[0] + 1, self.state[1])
+        elif action == "left":
+            nxtState = (self.state[0], self.state[1] - 1)
+        else:
+            nxtState = (self.state[0], self.state[1] + 1)
+            
+        return nxtState
+
     def nxtPosition(self, action):
         action = self.transitionModel(action)
         action = action.split()
 
         for a in action:
-            if a == "up":
-                nxtState = (self.state[0] - 1, self.state[1])
-            elif a == "down":
-                nxtState = (self.state[0] + 1, self.state[1])
-            elif a == "left":
-                nxtState = (self.state[0], self.state[1] - 1)
-            else:
-                nxtState = (self.state[0], self.state[1] + 1)
+            nxtState = self.movement(a) 
+
             # if next state legal
             if (nxtState[0] >= 0) and (nxtState[0] <= (len(self.grid_environment.board) -1)):
                 if (nxtState[1] >= 0) and (nxtState[1] <= (len(self.grid_environment.board[0]) -1)):
